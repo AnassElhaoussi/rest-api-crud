@@ -6,7 +6,7 @@ uuidv4()
 
 const router = express.Router()
 
-const users = [
+let users = [
     {
         firstName: "John",
         lastName: "Doe",
@@ -31,7 +31,7 @@ router.post('/', (req, res) => {
     const user = req.body
     
 
-    const userwithId = {...user, id: users.length - 1}
+    const userwithId = {...user, id: uuidv4()}
 
 
     users.push(userwithId)
@@ -40,9 +40,30 @@ router.post('/', (req, res) => {
 
 
 router.get('/:id', (req, res) => {
-    const userWithId = users.find(({id}) => id === parseInt(req.params.id))
+    const userWithId = users.find(({id}) => id === req.params.id)
+
     if(!userWithId) res.status(404).send('There is no user for this path')
     res.send(userWithId)
+})
+
+router.delete('/:id', (req, res) => {
+    users = users.filter(user => user.id !== req.params.id)
+
+    res.send(`User with id of ${req.params.id} is deleted !`)
+})
+
+router.patch('/:id', (req, res) => {
+
+
+    const user = users.find(user => user.id === req.params.id)
+
+    if(req.body.firstName) user.firstName = req.body.firstName
+
+    if(req.body.lastName) user.lastName = req.body.lastName
+
+    if(req.body.age) user.age = req.body.age
+
+    res.send(`User with id ${req.params.id} has been updated`)
 })
 
 export default router
